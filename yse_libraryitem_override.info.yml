@@ -1,0 +1,7 @@
+name: 'YSE LibraryItem Override'
+core_version_requirement: '^9 || ^10'
+dependencies:
+  - paragraphs:paragraphs
+description: 'Plugin to override paragraph behavior options when options are set on a from_library type paragraph.'
+type: module
+version: v1.2.3

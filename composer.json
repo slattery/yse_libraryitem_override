@@ -1,0 +1,6 @@
+{
+  "name": "slattery/yse_libraryitem_override",
+  "description": "Adding our own plugin to the style_options paragraph behavior module.",
+  "type": "drupal-custom-module",
+  "license": "GPL-2.0-or-later"
+}

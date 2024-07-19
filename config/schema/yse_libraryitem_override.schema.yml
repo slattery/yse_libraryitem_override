@@ -1,0 +1,7 @@
+paragraphs.behavior.settings.yse_libraryitem_override:
+  type: paragraphs.behavior.settings_base
+  label: 'YSE LibraryItem Override Settings'
+  mapping:
+    behavior_override:
+      type: boolean
+      label: 'Override Stored Behaviors?'

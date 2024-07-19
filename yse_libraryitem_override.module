@@ -1,0 +1,68 @@
+<?php
+
+use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Render\BubbleableMetadata;
+use Drupal\Core\Routing\RouteMatchInterface;
+use Drupal\paragraphs\ParagraphInterface;
+use Drupal\Component\Utility\Html;
+
+/**
+ * Implements hook_help().
+ */
+function yse_libraryitem_override_help($route_name, RouteMatchInterface $route_match) {
+  if ($route_name == 'help.page.yse_libraryitem_override') {
+    $text = file_get_contents(__DIR__ . '/README.md');
+    if (!Drupal::moduleHandler()->moduleExists('markdown')) {
+      return '<pre>' . $text . '</pre>';
+    }
+    else {
+      /** @var \Drupal\markdown\PluginManager\ParserManagerInterface $parser_manager */
+      $parser_manager = \Drupal::service('plugin.manager.markdown.parser');
+      $parser = $parser_manager->getDefaultParser([
+        'render_strategy' => ['type' => 'none'],
+      ]);
+      return $parser->parse($text);
+    }
+  }
+  return NULL;
+}
+
+
+function yse_libraryitem_override_entity_view_mode_alter(&$view_mode, EntityInterface $entity) {
+
+  $entity_typeid = $entity->getEntityTypeId();
+  if (!($entity_typeid == 'paragraph')) {
+    return;
+  }
+  $paragraph_type_txt = $entity->getType();
+  $paragraph_type_obj = $entity->getParagraphType();
+
+  if ( $paragraph_type_txt != 'from_library' ){
+    return;
+  }
+
+  if ( $paragraph_type_txt == 'from_library'
+    && $entity->hasField('field_reusable_paragraph')
+    && $entity->field_reusable_paragraph->entity
+    && $entity->field_reusable_paragraph->entity->paragraphs->entity
+    ){
+
+    $override_enabled_ontype = $paragraph_type_obj->getEnabledBehaviorPlugins()['yse_libraryitem_override'];
+    $override_enabled_onthis = $entity->getBehaviorSetting('yse_libraryitem_override', 'override_behavior');
+    //dd([$override_enabled_ontype, $override_enabled_onthis ]);
+
+    if ($override_enabled_ontype && $override_enabled_onthis){
+      foreach ($paragraph_type_obj->getEnabledBehaviorPlugins() as $plugin) {
+        if ($plugin->getPluginId() == 'paragraphs_viewmode_behavior'){
+          $plugin->entityViewModeAlter($view_mode, $entity->field_reusable_paragraph->entity->paragraphs->entity);
+        }
+      }
+
+      $stored_para = $entity->field_reusable_paragraph->entity->paragraphs->entity;
+      $local_settings = $entity->getAllBehaviorSettings();
+      $stored_para->setAllBehaviorSettings($local_settings);
+    }
+  }
+}
+
+
