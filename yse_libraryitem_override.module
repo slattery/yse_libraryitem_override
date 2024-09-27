@@ -28,6 +28,7 @@ function yse_libraryitem_override_help($route_name, RouteMatchInterface $route_m
 }
 
 //TODO these could be plugins w base in case we don't want to write all the settings all the time.
+
 function yse_libraryitem_override_entity_view_mode_alter(&$view_mode, EntityInterface $entity) {
 
   if (!isApplicable($entity)) {
@@ -35,28 +36,25 @@ function yse_libraryitem_override_entity_view_mode_alter(&$view_mode, EntityInte
   }
 
   $paragraph_type_obj = $entity->getParagraphType();
-  $override_enabled_ontype = $paragraph_type_obj->getEnabledBehaviorPlugins()['yse_libraryitem_override'];
-  $override_enabled_onthis = $entity->getBehaviorSetting('yse_libraryitem_override', 'override_behavior');
-
-  if ($override_enabled_ontype && $override_enabled_onthis){
-    foreach ($paragraph_type_obj->getEnabledBehaviorPlugins() as $plugin) {
-      if ($plugin->getPluginId() == 'paragraphs_viewmode_behavior'){
-        /* @var \Drupal\paragraphs\Plugin\ParagraphsBehavior\ParagraphsViewModeBehavior $plugin */
-        $plugin->entityViewModeAlter($view_mode, $entity->field_reusable_paragraph->entity->paragraphs->entity);
-      }
+  foreach ($paragraph_type_obj->getEnabledBehaviorPlugins() as $plugin) {
+    if ($plugin->getPluginId() == 'paragraphs_viewmode_behavior'){
+      /* @var \Drupal\paragraphs\Plugin\ParagraphsBehavior\ParagraphsViewModeBehavior $plugin */
+      $plugin->entityViewModeAlter($view_mode, $entity->field_reusable_paragraph->entity->paragraphs->entity);
     }
-
-    /* @var \Drupal\paragraphs\ParagraphInterface $stored_para */
-    $stored_para = $entity->field_reusable_paragraph->entity->paragraphs->entity;
-    $local_settings = $entity->getAllBehaviorSettings();
-    //TODO: might want to do a merge instead someday
-    $stored_para->setAllBehaviorSettings($local_settings);
   }
+
+  /* @var \Drupal\paragraphs\ParagraphInterface $stored_para */
+  $stored_para = $entity->field_reusable_paragraph->entity->paragraphs->entity;
+  $local_settings = $entity->getAllBehaviorSettings();
+
+  //TODO: might want to do a merge instead someday
+  $stored_para->setAllBehaviorSettings($local_settings);
 }
 
-private function isApplicable(EntityInterface $entity) {
+function isApplicable(EntityInterface $entity) {
     return $entity->getEntityTypeId() == 'paragraph'
         && $entity->getType() == 'from_library'
+        && $entity->getParagraphType()->getEnabledBehaviorPlugins()['yse_libraryitem_override']
         && $entity->hasField('field_reusable_paragraph')
         && $entity->field_reusable_paragraph->entity
         && $entity->field_reusable_paragraph->entity->paragraphs->entity;
