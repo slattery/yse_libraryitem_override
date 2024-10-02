@@ -5,4 +5,4 @@ dependencies:
   - paragraphs:paragraphs
 description: 'Plugin to override paragraph behavior options when options are set on a from_library type paragraph.'
 type: module
-version: v1.2
+version: v1.3.0
