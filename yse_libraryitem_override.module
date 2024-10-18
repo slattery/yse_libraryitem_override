@@ -37,7 +37,7 @@ function yse_libraryitem_override_entity_view_mode_alter(&$view_mode, EntityInte
 
   $paragraph_type_obj = $entity->getParagraphType();
   foreach ($paragraph_type_obj->getEnabledBehaviorPlugins() as $plugin) {
-    if ($plugin->getPluginId() == 'paragraphs_viewmode_behavior'){
+    if ($plugin->getPluginId() == 'paragraphs_viewmode_behavior') {
       /* @var \Drupal\paragraphs\Plugin\ParagraphsBehavior\ParagraphsViewModeBehavior $plugin */
       $plugin->entityViewModeAlter($view_mode, $entity->field_reusable_paragraph->entity->paragraphs->entity);
     }
@@ -52,10 +52,10 @@ function yse_libraryitem_override_entity_view_mode_alter(&$view_mode, EntityInte
 }
 
 function isApplicable(EntityInterface $entity) {
-    return $entity->getEntityTypeId() == 'paragraph'
-        && $entity->getType() == 'from_library'
-        && $entity->getParagraphType()->getEnabledBehaviorPlugins()['yse_libraryitem_override']
-        && $entity->hasField('field_reusable_paragraph')
-        && $entity->field_reusable_paragraph->entity
-        && $entity->field_reusable_paragraph->entity->paragraphs->entity;
+  return $entity->getEntityTypeId() == 'paragraph'
+    && $entity->getType() == 'from_library'
+    && array_key_exists('yse_libraryitem_override', $entity->getParagraphType()->getEnabledBehaviorPlugins())
+    && $entity->hasField('field_reusable_paragraph')
+    && $entity->field_reusable_paragraph->entity
+    && $entity->field_reusable_paragraph->entity->paragraphs->entity;
 }
